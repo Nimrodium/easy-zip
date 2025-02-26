@@ -1,0 +1,8 @@
+[package]
+name = "ezip"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+colorize = "0.1.0"
+zip-extensions = "0.8.1"
