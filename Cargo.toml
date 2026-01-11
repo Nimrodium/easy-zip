@@ -1,8 +1,10 @@
 [package]
-name = "ezip"
+name = "sticky"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+clap = { version = "4.5.38", features = ["derive"] }
 colorize = "0.1.0"
+zip = "7.0.0"
 zip-extensions = "0.8.1"
