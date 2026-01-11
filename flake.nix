@@ -21,8 +21,8 @@
         };
         naersk' = pkgs.callPackage naersk { };
       in
-      rec {
-        defaultPackage = naersk'.buildPackage { src = ./.; };
+      {
+        packages.default = naersk'.buildPackage { src = ./.; };
         devShell = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             rustc
@@ -30,17 +30,5 @@
           ];
         };
       }
-
     );
-
-  # let
-  #   supportedSystems = [ "x86_64-linux" ];
-  #   forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-  #   pkgsFor = nixpkgs.legacyPackages;
-  # in
-  # {
-  #   packages = forAllSystems (system: {
-  #     default = pkgsFor.${system}.callPackage ./. { };
-  #   });
-  # };
 }
