@@ -37,7 +37,20 @@ Basic compressed archive tool for easily working with compressed archives.
 > compresses file1.txt file2.txt file3.md to `archive.zip`
 * `sticky file1.txt file2.txt file3.md -t files.tar.gz`
 > compresses file1.txt file2.txt file3.md to files.tar.gz using tar.gz compression
-* `sticky `
 
+sticky can infer what you want to do via the file extensions of `--target` and source files, 
+however it will fail if sources contains both compressed archives and uncompressed files. in this case, the `-e`/`-c` flags are required to disambiguate
+
+
+
+# Installation
+<!--## Cargo
+```bash
+```-->
+## Nix
+with flakes
+```nix
+
+```
 # why
 i can never remember all the random flags required to extract all the different archive formats, so this is a rust cli tool for extracting archives agnostically
