@@ -1,1 +1,7 @@
 /target
+test
+test.zip
+archive.zip
+*.zip
+*.tar.gz
+*.zstd

@@ -1,12 +1,13 @@
-use crate::formats::ArchiveFormat;
+use crate::formats::{ArchiveFormat, Options};
 
 pub struct TarGz {}
 
 impl ArchiveFormat for TarGz {
     fn compress(
         &self,
-        sources: &[&std::path::Path],
+        sources: &[std::path::PathBuf],
         archive: &std::path::Path,
+        options: Options,
     ) -> Result<(), String> {
         todo!()
     }

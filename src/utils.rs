@@ -25,3 +25,16 @@ macro_rules! error {
         eprintln!("{}: {} {}", crate::NAME, "error".red(),format!($($arg)*));
     }};
 }
+
+macro_rules! verbose {
+    () => {
+        if crate::VERBOSE {
+            println!()
+        }
+    };
+    ($($arg:tt)*) => {{
+        if crate::VERBOSE {
+            println!("{}: {} {}", crate::NAME, "error".red(),format!($($arg)*));
+        }
+    }};
+}
