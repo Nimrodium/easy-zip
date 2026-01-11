@@ -3,10 +3,11 @@
 }:
 let
   lib = pkgs.lib;
+  manifest = (lib.importTOML ./Cargo.toml).package;
 in
 pkgs.rustPlatform.buildRustPackage {
-  pname = "sticky";
-  version = "1.0";
+  pname = manifest.name;
+  version = manifest.version;
   cargoLock.lockFile = ./Cargo.lock;
   src = lib.cleanSource ./.;
 }

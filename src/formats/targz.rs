@@ -1,6 +1,7 @@
 use crate::formats::{ArchiveFormat, Options};
 
-pub struct TarGz {}
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+pub struct TarGz;
 
 impl ArchiveFormat for TarGz {
     fn compress(

@@ -46,14 +46,8 @@ fn infer_format(archive: &Path) -> Option<Format> {
         .map(|ext| Format::from_str(&ext).ok())
         .unwrap_or(None)
 }
-fn infer(sources: &[PathBuf]) -> (Option<Mode>, Option<Format>) {
+fn infer(sources: &[PathBuf], target: &Option<PathBuf>) -> (Option<Mode>, Option<Format>) {
     let files = sources.iter().filter(|p| p.is_file());
-    // .map(|p| utils::extract_file_extension(p));
-    // .zip(sources).filter(|(ext,p)|p.)
-    // .filter(|(ext, _)| ext.is_some())
-    // .map(|(ext, p)| (ext.unwrap(), p))
-    // .filter(|(_, p)| !p.is_dir());
-
     // if any directories are present, must be compress. if any valid formats are present in the files, then ambigious.
     let dirs = sources.iter().map(|f| f.is_dir()).filter(|d| *d).count();
 
@@ -72,7 +66,10 @@ fn infer(sources: &[PathBuf]) -> (Option<Mode>, Option<Format>) {
         None
     };
     let archive_count = formats.len();
-
+    let target_format = target
+        .as_ref()
+        .map(|t| Format::format_from_path(t))
+        .unwrap_or(None);
     // if only directories are present, then must be compress
     // if no archives are present, must be compress
     // if only archives are present, must be extract
@@ -87,7 +84,7 @@ fn infer(sources: &[PathBuf]) -> (Option<Mode>, Option<Format>) {
         (true, false, true) => ambigious,
         (false, false, false) => ambigious,
         (true, false, false) => (extract, format),
-        _ => (compress, format),
+        _ => (compress, target_format),
     }
 }
 
@@ -100,8 +97,9 @@ fn main() -> Result<(), String> {
         .map(|s| PathBuf::from(s))
         .collect::<Vec<PathBuf>>();
     unsafe { VERBOSE = args.verbose };
+    let target = args.target.map(|t| PathBuf::from(t));
     let (mode, format) = {
-        let (op_mode, op_format) = infer(&sources);
+        let (op_mode, op_format) = infer(&sources, &target);
         println!("{op_mode:?} {op_format:?}");
         let mode = if args.compress && args.extract {
             return Err("cannot use compress and extract at the same time!".to_string());
@@ -125,7 +123,7 @@ fn main() -> Result<(), String> {
             if let Some(f) = op_format {
                 f // vec is stupid actually
             } else {
-                Format::Zip
+                Format::default()
                 // return Err("cannot infer archive format, please use -f flag".to_string());
             }
         };
@@ -133,26 +131,26 @@ fn main() -> Result<(), String> {
     };
     match mode {
         Mode::Compress => {
-            let target = if let Some(t) = args.target {
-                PathBuf::from(t)
-            } else if sources.len() == 1 {
-                sources[0].with_added_extension(format.get_extension())
+            let target = if let Some(t) = target {
+                t
             } else {
-                PathBuf::from("archive.".to_string() + format.get_extension().as_str())
+                sources[0].with_added_extension(format.get_extension())
             };
             format.compress(&sources, &target, options)?;
         }
         Mode::Extract => {
             let archive = sources[0].clone();
-            let target = PathBuf::from(if let Some(t) = args.target {
+            let target = if let Some(t) = target {
                 t
             } else {
-                archive
-                    .to_string_lossy()
-                    .strip_suffix(&(".".to_string() + &format.get_extension().as_str()))
-                    .unwrap_or(&archive.to_string_lossy())
-                    .to_string()
-            });
+                PathBuf::from(
+                    archive
+                        .to_string_lossy()
+                        .strip_suffix(&(".".to_string() + &format.get_extension().as_str()))
+                        .unwrap_or(&archive.to_string_lossy())
+                        .to_string(),
+                )
+            };
             format.extract(&archive, &target)?;
         }
     }

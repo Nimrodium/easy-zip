@@ -3,7 +3,10 @@ use std::{
     str::FromStr,
 };
 
-use crate::{formats::zip::Zip, utils};
+use crate::{
+    formats::{targz::TarGz, zip::Zip, zstd::Zstd},
+    utils,
+};
 
 mod targz;
 mod zip;
@@ -17,11 +20,7 @@ impl Options {
         Self { compression_level }
     }
 }
-// impl Options {
-//     fn new(co) -> Self {
 
-//     }
-// }
 pub trait ArchiveFormat {
     fn compress(&self, sources: &[PathBuf], archive: &Path, options: Options)
         -> Result<(), String>;
@@ -30,16 +29,16 @@ pub trait ArchiveFormat {
 
 #[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub enum Format {
-    Zip,
-    TarGz,
-    Zstd,
+    Zip(Zip),
+    TarGz(TarGz),
+    Zstd(Zstd),
 }
 impl ToString for Format {
     fn to_string(&self) -> String {
         match self {
-            Self::Zip => "zip",
-            Self::TarGz => "tar.gz",
-            Self::Zstd => "zstd",
+            Self::Zip(_) => "zip",
+            Self::TarGz(_) => "tar.gz",
+            Self::Zstd(_) => "zstd",
         }
         .to_string()
     }
@@ -49,9 +48,9 @@ impl FromStr for Format {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "zip" => Ok(Self::Zip),
-            "tar.gz" | "targz" => Ok(Self::TarGz),
-            "zstd" => Ok(Self::Zstd),
+            "zip" => Ok(Self::Zip(Zip {})),
+            "tar.gz" | "targz" => Ok(Self::TarGz(TarGz {})),
+            "zstd" => Ok(Self::Zstd(Zstd {})),
             _ => Err("not a valid archive format ( zip tar.gz zstd )".to_string()),
         }
     }
@@ -64,17 +63,17 @@ impl ArchiveFormat for Format {
         options: Options,
     ) -> Result<(), String> {
         match self {
-            Format::Zip => Zip::default().compress(sources, archive, options),
-            Format::TarGz => todo!(),
-            Format::Zstd => todo!(),
+            Format::Zip(zip) => zip.compress(sources, archive, options),
+            Format::TarGz(targz) => targz.compress(sources, archive, options),
+            Format::Zstd(zstd) => zstd.compress(sources, archive, options),
         }
     }
 
     fn extract(&self, archive: &Path, target: &Path) -> Result<(), String> {
         match self {
-            Format::Zip => Zip::default().extract(archive, target),
-            Format::TarGz => todo!(),
-            Format::Zstd => todo!(),
+            Format::Zip(zip) => zip.extract(archive, target),
+            Format::TarGz(targz) => targz.extract(archive, target),
+            Format::Zstd(zstd) => zstd.extract(archive, target),
         }
     }
 }
@@ -84,5 +83,13 @@ impl Format {
     }
     pub fn get_extension(&self) -> String {
         self.to_string()
+    }
+    pub fn format_from_path(p: &Path) -> Option<Self> {
+        utils::extract_file_extension(p)
+            .map(|ext| Format::from_str(&ext).ok())
+            .unwrap_or(None)
+    }
+    pub fn default() -> Self {
+        Self::Zip(Zip)
     }
 }

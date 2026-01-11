@@ -1,5 +1,5 @@
 use crate::formats::{ArchiveFormat, Options};
-
+#[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub struct Zstd;
 impl ArchiveFormat for Zstd {
     fn compress(

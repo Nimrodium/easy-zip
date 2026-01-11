@@ -41,6 +41,7 @@ Basic compressed archive tool for easily working with compressed archives.
 sticky can infer what you want to do via the file extensions of `--target` and source files, 
 however it will fail if sources contains both compressed archives and uncompressed files. in this case, the `-e`/`-c` flags are required to disambiguate
 
+sticky can inferwhat you want to do based on the files you provide to it, 
 
 
 # Installation
@@ -54,3 +55,4 @@ with flakes
 ```
 # why
 i can never remember all the random flags required to extract all the different archive formats, so this is a rust cli tool for extracting archives agnostically
+sticky because, like, you stick a bunch of files together haphazardly

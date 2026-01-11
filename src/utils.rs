@@ -17,6 +17,7 @@ pub fn extract_file_extension(path: &Path) -> Option<String> {
 
     ext.map(|ext| ext.chars().rev().collect::<String>())
 }
+#[macro_export]
 macro_rules! error {
     () => {
         eprintln!()
@@ -26,15 +27,18 @@ macro_rules! error {
     }};
 }
 
+#[macro_export]
 macro_rules! verbose {
     () => {
-        if crate::VERBOSE {
-            println!()
+        unsafe {
+            if crate::VERBOSE {
+                println!()
+            }
         }
     };
     ($($arg:tt)*) => {{
-        if crate::VERBOSE {
+       unsafe { if crate::VERBOSE {
             println!("{}: {} {}", crate::NAME, "error".red(),format!($($arg)*));
-        }
+       }}
     }};
 }
