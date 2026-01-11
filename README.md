@@ -45,11 +45,12 @@ sticky can inferwhat you want to do based on the files you provide to it,
 
 
 # Installation
-<!--## Cargo
+## Cargo
 ```bash
-```-->
-## Nix
-with flakes
+git clone https://github.com/nimrodium/sticky.git && cd sticky
+cargo install --path .
+```
+## Nix Flake
 ```nix
 
 ```

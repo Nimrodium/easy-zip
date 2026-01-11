@@ -1,7 +1,7 @@
-use std::fs::File;
-
 use crate::formats::{ArchiveFormat, Options};
 use crate::verbose;
+use colorize::AnsiColor;
+use std::fs::File;
 use zip::{write::FileOptions, ZipArchive, ZipWriter};
 #[derive(Debug, Clone, PartialEq, Eq, Copy)]
 pub struct Zip;
@@ -18,7 +18,7 @@ impl ArchiveFormat for Zip {
         let mut archive_file = ZipWriter::new(file);
         let zip_options = FileOptions::DEFAULT.compression_level(options.compression_level);
         for source in sources {
-            verbose!();
+            verbose!("compressing {source:?} -> {archive:?}");
             archive_file
                 .start_file_from_path(source, zip_options)
                 .map_err(|e| {

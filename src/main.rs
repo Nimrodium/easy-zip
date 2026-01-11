@@ -1,9 +1,6 @@
-use clap::{CommandFactory, Parser};
+use clap::Parser;
 use colorize::AnsiColor;
-use std::{
-    path::{Path, PathBuf},
-    str::FromStr,
-};
+use std::path::PathBuf;
 
 mod formats;
 #[macro_use]
@@ -36,11 +33,11 @@ struct Args {
     verbose: bool,
 }
 
-fn infer_format(archive: &Path) -> Option<Format> {
-    utils::extract_file_extension(archive)
-        .map(|ext| Format::from_str(&ext).ok())
-        .unwrap_or(None)
-}
+// fn infer_format(archive: &Path) -> Option<Format> {
+//     utils::extract_file_extension(archive)
+//         .map(|ext| Format::from_str(&ext).ok())
+//         .unwrap_or(None)
+// }
 
 fn main() -> Result<(), String> {
     let args = Args::parse();
@@ -54,7 +51,6 @@ fn main() -> Result<(), String> {
     let target = args.target.map(|t| PathBuf::from(t));
     let (mode, format) = {
         let (op_mode, op_format) = infer(&sources, &target);
-        println!("{op_mode:?} {op_format:?}");
         let mode = if args.compress && args.extract {
             return Err("cannot use compress and extract at the same time!".to_string());
         } else if args.compress {
@@ -90,7 +86,12 @@ fn main() -> Result<(), String> {
             } else {
                 sources[0].with_added_extension(format.get_extension())
             };
+            verbose!(
+                "compressing sources {sources:?} -> {target:?} with {} archive format",
+                format.to_string()
+            );
             format.compress(&sources, &target, options)?;
+            success!("successfully compressed {sources:?} -> {target:?}");
         }
         Mode::Extract => {
             let archive = sources[0].clone();
@@ -105,7 +106,9 @@ fn main() -> Result<(), String> {
                         .to_string(),
                 )
             };
+            verbose!("extracting archive {archive:?} -> {target:?}");
             format.extract(&archive, &target)?;
+            success!("successfully extracted archive {archive:?} -> {target:?}");
         }
     }
     Ok(())

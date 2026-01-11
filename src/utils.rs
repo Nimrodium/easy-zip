@@ -1,9 +1,9 @@
+use crate::formats::Format;
+
 use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-
-use crate::formats::Format;
 
 pub fn extract_file_extension(path: &Path) -> Option<String> {
     // does not use p.extension as i want to catch .tar.gz
@@ -90,7 +90,17 @@ macro_rules! verbose {
     };
     ($($arg:tt)*) => {{
        unsafe { if crate::VERBOSE {
-            println!("{}: {} {}", crate::NAME, "error".red(),format!($($arg)*));
+            println!("{}: {}", crate::NAME,format!($($arg)*).yellow());
        }}
+    }};
+}
+
+#[macro_export]
+macro_rules! success {
+    () => {
+        {println!()}
+    };
+    ($($arg:tt)*) => {{
+        println!("{}: {}", crate::NAME,format!($($arg)*).green());
     }};
 }
