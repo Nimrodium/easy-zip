@@ -5,7 +5,7 @@ i made this because the zip and unzip commands (mostly unzip) are for some reaso
 i still have no idea how to use them and i have to look it up every single time. so i finally snapped and cooked up this quick rust program to zip stuff in a mentally sane syntax, its less feature rich but cmon be honest youre only ever unzipping and zipping, if youre using zip/unzip for anything else youre copying it from a command on ask ubuntu.-->
 
 # Sticky
-Basic compressed archive tool for easily working with compressed archives.
+Basic compressed archive tool with a sane syntax for easily working with compressed archives.
 
 
 # Flags
@@ -41,18 +41,24 @@ Basic compressed archive tool for easily working with compressed archives.
 sticky can infer what you want to do via the file extensions of `--target` and source files, 
 however it will fail if sources contains both compressed archives and uncompressed files. in this case, the `-e`/`-c` flags are required to disambiguate
 
-sticky can inferwhat you want to do based on the files you provide to it, 
-
-
 # Installation
 ## Cargo
 ```bash
-git clone https://github.com/nimrodium/sticky.git && cd sticky
-cargo install --path .
+# git clone  && cd sticky
+cargo install --git https://github.com/nimrodium/sticky.git
 ```
-## Nix Flake
+## Nix
 ```nix
+# in your flake.nix inputs
+sticky = {
+      url = "github:nimrodium/sticky";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+```
 
+```nix
+# in your systemPackages, make sure you have inputs passed to your configuration.nix or explicitly pass sticky
+with pkgs; [ inputs.sticky.packages.${pkgs.stdenv.hostPlatform.system}.default ];
 ```
 # why
 i can never remember all the random flags required to extract all the different archive formats, so this is a rust cli tool for extracting archives agnostically
