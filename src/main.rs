@@ -9,7 +9,7 @@ use crate::formats::{ArchiveFormat, Format, Options};
 use utils::{infer, Mode};
 const NAME: &str = "sticky";
 static mut VERBOSE: bool = false;
-
+/// An easy archive handler, supporting zip, tar.gz, and zstd
 #[derive(Debug, Parser)]
 struct Args {
     #[arg(short, long, default_value_t = false)]
