@@ -44,7 +44,6 @@ however it will fail if sources contains both compressed archives and uncompress
 # Installation
 ## Cargo
 ```bash
-# git clone  && cd sticky
 cargo install --git https://github.com/nimrodium/sticky.git
 ```
 ## Nix
