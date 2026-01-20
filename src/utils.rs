@@ -30,7 +30,7 @@ pub enum Mode {
 pub fn infer(sources: &[PathBuf], target: &Option<PathBuf>) -> (Option<Mode>, Option<Format>) {
     let files = sources.iter().filter(|p| p.is_file());
     // if any directories are present, must be compress. if any valid formats are present in the files, then ambigious.
-    let dirs = sources.iter().map(|f| f.is_dir()).filter(|d| *d).count();
+    let dirs = sources.iter().filter(|f| f.is_dir()).count();
 
     // if any valid formats are present, must be extract. else compress. if any non-archive files present, then ambigious
     // let file_formats = files.map(|(ext, _)| Format::from_str(&ext).ok());
