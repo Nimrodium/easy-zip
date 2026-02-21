@@ -35,7 +35,7 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     verbose: bool,
 }
-
+//test
 #[derive(Debug, Parser)]
 struct ArgsBetter {
     #[command(subcommand)]
