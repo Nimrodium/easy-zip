@@ -1,10 +1,42 @@
 use crate::formats::Format;
 
 use std::{
+    borrow::Cow,
     path::{Path, PathBuf},
     str::FromStr,
 };
 
+// pub fn get_target()
+fn get_first_dot(path: &str) -> Option<usize> {
+    path.find('.')
+}
+fn path_filename(path: &Path) -> Option<Cow<'_, str>> {
+    path.file_name().and_then(|p| Some(p.to_string_lossy()))
+}
+// pub fn prune_ext(path: &Path) -> Option<String> {
+//     if let Some((stem, _)) = get_stem_ext(path) {
+//         Some(stem)
+//     } else {
+//         path_filename(path).and_then(|p| Some(p.to_string()))
+//     }
+// }
+pub fn get_stem_ext(path: &Path) -> Option<(String, String)> {
+    if let Some(name) = path_filename(path) {
+        if name.starts_with('.') {
+            None // stop for hidden files
+        } else {
+            let first_dot = if let Some(d) = get_first_dot(&name) {
+                d
+            } else {
+                return None;
+            };
+            let (stem, ext) = name.split_at(first_dot);
+            Some((stem.to_string(), ext.to_string()))
+        }
+    } else {
+        None
+    }
+}
 pub fn extract_file_extension(path: &Path) -> Option<String> {
     // does not use p.extension as i want to catch .tar.gz
     let name = path.file_name().and_then(|p| Some(p.to_string_lossy()));
@@ -37,10 +69,10 @@ pub fn infer(sources: &[PathBuf], target: &Option<PathBuf>) -> (Option<Mode>, Op
     let file_formats =
         files.map(|f| extract_file_extension(f).and_then(|ext| Format::from_str(&ext).ok()));
     let non_archive = file_formats.clone().filter(|f| f.is_none()).count();
-    let formats = file_formats
+    let formats: Vec<Format> = file_formats
         .filter(|f| f.is_some())
         .map(|f| f.unwrap())
-        .collect::<Vec<Format>>();
+        .collect();
     let format = if formats.iter().all(|f| Some(f) == formats.get(0)) {
         formats.get(0).cloned()
     } else {
